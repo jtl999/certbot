@@ -16,4 +16,5 @@ fi
   -e certbot-apache \
   -e certbot-nginx \
   -e letshelp-certbot \
+  dnspython \
   -e certbot-compatibility-test
