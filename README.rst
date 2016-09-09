@@ -59,6 +59,10 @@ obtain and install the certs, you could do this::
 email and agreement to the Let's Encrypt Subscriber Agreement; you can
 automate those with ``--email`` and ``--agree-tos``)
 
+With this fork you can use DNS based validation. An example:
+
+  ./certbot certonly --preferred-challenges dns-01 --authenticator manual -d example.com -d www.example.com --manual-public-ip-logging-ok
+
 If you want to use a webserver that doesn't have full plugin support yet, you
 can still use "standalone" or "webroot" plugins to obtain a certificate::
 
