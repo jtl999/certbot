@@ -177,7 +177,7 @@ class CLITest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         args = ["--standalone", "certonly", "-m", "none@none.com",
                 "-d", "example.com", '--agree-tos'] + self.standard_args
         det.return_value = mock.MagicMock(), None
-        afd.return_value = mock.MagicMock(), "newcert"
+        afd.return_value = "newcert", mock.MagicMock()
 
         with mock.patch('certbot.main.client.acme_client.ClientNetwork') as acme_net:
             self._call_no_clientmock(args)
@@ -423,6 +423,18 @@ class CLITest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         namespace = parse(long_args)
         self.assertEqual(namespace.domains, ['example.com', 'another.net'])
 
+    def test_preferred_challenges(self):
+        from acme.challenges import HTTP01, TLSSNI01, DNS01
+        parse = self._get_argument_parser()
+
+        short_args = ['--preferred-challenges', 'http, tls-sni-01, dns']
+        namespace = parse(short_args)
+
+        self.assertEqual(namespace.pref_challs, [HTTP01, TLSSNI01, DNS01])
+
+        short_args = ['--preferred-challenges', 'jumping-over-the-moon']
+        self.assertRaises(argparse.ArgumentTypeError, parse, short_args)
+
     def test_server_flag(self):
         parse = self._get_argument_parser()
         namespace = parse('--server example.com'.split())
@@ -567,6 +579,7 @@ class CLITest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         chain_path = '/etc/letsencrypt/live/foo.bar/fullchain.pem'
         mock_lineage = mock.MagicMock(cert=cert_path, fullchain=chain_path)
         mock_lineage.should_autorenew.return_value = due_for_renewal
+        mock_lineage.has_pending_deployment.return_value = False
         mock_certr = mock.MagicMock()
         mock_key = mock.MagicMock(pem='pem_key')
         mock_client = mock.MagicMock()
